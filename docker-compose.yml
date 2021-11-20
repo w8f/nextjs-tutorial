@@ -1,0 +1,13 @@
+version: "3.8"
+services:
+  front:
+    build:
+      context: ./
+      dockerfile: ./docker/front/Dockerfile
+    command: sh -c "cd nextjs-blog & npm run dev"
+    ports:
+      - "3000:3000"
+    tty: true
+    volumes:
+      - "./front:/front"
+    working_dir: /front/nextjs-blog
