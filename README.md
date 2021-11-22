@@ -9,6 +9,7 @@ Next.js に入門してみた。
 - [環境構築](#section2)
 - [ルーティング](#section3)
 - [Asset, Metadata, CSS](#section4)
+- [Pre-rendering and Data Fetching](#section5)
 
 ## <a id="section1" href="#section1"> Why Next.js </a>
 
@@ -180,3 +181,66 @@ export default function App({ Component, pageProps }) {
   <https://nextjs.org/learn/basics/assets-metadata-css/styling-tips>
 
 ---
+
+## <a id="section5" href="#section5">Pre-rendering and Data Fetching</a>
+
+Next.js  は基本的に、全てのページを**プリレンダリング**する。
+
+> Next.js は、クライアントサイドの JavaScript ですべてを処理するのではなく、\
+> 各ページの HTML を事前に生成します。プリレンダリングを行うことで、パフォーマンスや SEO の向上につながります。
+
+**プリレンダリング**の形式は 2 つある。\
+具体的には HTML の生成されるタイミングが異なる。\
+また、ページごとにレンダリングの方法を指定できる。
+
+- SSG(Static Generation)　(※Next.js 公式は SSG を推奨している)
+
+  > ビルド時に HTML を生成するプリレンダリング方式です。\
+  > プリレンダリングされた HTML は、各リクエストで再利用されます。\
+  > ページを一度作成して CDN で配信することで、リクエストごとにサーバーがページをレンダリングするよりもはるかに高速になる ◎
+
+- SSR(Server-side Rendering)
+  > サーバーサイドレンダリングは、リクエストごとに HTML を生成するプリレンダリング方式です。
+
+### プリレンダリングの使い分け
+
+ユーザーがリクエストする前に、このページを事前にレンダリングすることができるかどうか。\
+→ 事前にレンダリングできる場合は、SSG がよい。\
+頻繁に更新されるデータを表示するページでは、リクエストのたびにページの内容が変わる。\
+→ Server-side Rendering 　を選択する。
+
+## SSG
+
+### getStaticProps
+
+ビルド時にデータを fetch する必要がある場合
+→ **getStaticProps** 関数を使用する。\
+**getStaticProps** 関数内でデータを fetch して Props としてデータを渡すことができる。\
+(ex, file system, api, DB...)
+
+```js
+import { getSortedPostsData } from "../lib/posts";
+
+// getStaticPropsは、サーバー側で実行される関数
+// = ブラウザ側に渡すこと無く、DBのクエリなども発行できちゃう。
+// getStaticPropsは、pagesディレクトリのページでのみ使用可能
+export async function getStaticProps() {
+  const allPostsData = getSortedPostsData();
+  return {
+    props: {
+      allPostsData,
+    },
+  };
+}
+
+export default function Home({ allPostsData }) {
+  return (
+    <div>
+      // 描画内容
+    </div>
+  )
+
+```
+
+> 注：Next.js は、クライアントとサーバーの両方で fetch()を実装しています。\
+> インポートする必要はありません。
