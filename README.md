@@ -10,6 +10,9 @@ Next.js に入門してみた。
 - [ルーティング](#section3)
 - [Asset, Metadata, CSS](#section4)
 - [Pre-rendering and Data Fetching](#section5)
+  - [SSG](#section6)
+  - [Server-side Rendering](#section7)
+  - [Client Side Rendering](#section8)
 
 ## <a id="section1" href="#section1"> Why Next.js </a>
 
@@ -209,7 +212,7 @@ Next.js  は基本的に、全てのページを**プリレンダリング**す
 頻繁に更新されるデータを表示するページでは、リクエストのたびにページの内容が変わる。\
 → Server-side Rendering 　を選択する。
 
-## SSG
+## <a id="section6" href="#section6">SSG</a>
 
 ### getStaticProps
 
@@ -244,3 +247,44 @@ export default function Home({ allPostsData }) {
 
 > 注：Next.js は、クライアントとサーバーの両方で fetch()を実装しています。\
 > インポートする必要はありません。
+
+## <a id="section7" href="#section7">Server-side Rendering</a>
+
+> Server-side Rendering を使用するには、ページから getStaticProps ではなく\
+> **getServerSideProps** をエクスポートする必要があります。
+
+```js
+// request時にデータを取得する必要がある場合のみ使用する。
+export async function getServerSideProps(context) {
+  return {
+    props: {
+      // props for your component
+    },
+  };
+}
+```
+
+## <a id="section8" href="#section8">Client Side Rendering</a>
+
+プリレンダリングする必要がそもそもない場合は Client Side Rendering を選択することもできる。
+
+外部データを必要としないページのロード → クライアント側からデータを取得する。\
+（ユーザのダッシュボード画面等頻繁に更新されるページ、SEO の対策が必要でない場合など）
+
+Client Side Rendering を使用してデータを取得する場合は、\
+**SWR** と言われる React hooks を使用するのが推奨されている。
+
+```js
+// 使用例
+import useSWR from "swr";
+
+function Profile() {
+  const { data, error } = useSWR("/api/user", fetch);
+
+  if (error) return <div>failed to load</div>;
+  if (!data) return <div>loading...</div>;
+  return <div>hello {data.name}!</div>;
+}
+```
+
+---
