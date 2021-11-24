@@ -13,6 +13,7 @@ Next.js に入門してみた。
   - [SSG](#section6)
   - [Server-side Rendering](#section7)
   - [Client Side Rendering](#section8)
+- [Dynamic Routes](#section9)
 
 ## <a id="section1" href="#section1"> Why Next.js </a>
 
@@ -43,6 +44,18 @@ Next.js に入門してみた。
 
 ```sh
 npx create-next-app
+```
+
+※チュートリアルで使用したライブラリのインストール
+
+```sh
+# markdownのパースに必要
+npm install gray-matter
+# markdownのレンダリングに必要
+npm install remark remark-html
+# 日付のフォーマットに必要
+npm install date-fns
+
 ```
 
 ---
@@ -288,3 +301,105 @@ function Profile() {
 ```
 
 ---
+
+## <a id="section9" href="#section9">Dynamic Routes</a>
+
+動的ルーティングで、静的ページを生成する方法
+
+/posts/\<id>として、id ごとに 動的に静的ページを生成したい時\
+**getStaticPaths** という非同期関数をエクスポートします。この関数では、id に指定できる値のリストを返す。
+
+```js
+// id に指定できる値のリストの例
+// 文字列のリストではなく、オブジェクトの配列を返却しなければならない。
+// 各オブジェクトは、params キーを持ち、id キーを持つオブジェクトを含んでいなければなりません\
+//（ファイル名に[id]を使用しているため）。
+
+[
+  {
+    params: {
+      id: "ssg-ssr",
+    },
+  },
+  {
+    params: {
+      id: "pre-rendering",
+    },
+  },
+];
+```
+
+流れとしては、
+
+1. /posts/[id].js 内に、**getStaticPaths**関数を定義し、 id の配列 を返却する
+2. /posts/[id].js 内に、**getStaticProps**関数を定義し、id に紐づくデータを取得する。
+3. 2 で取得したデータを Props として渡す。
+
+```js
+export async function getAllPostIds() {
+  // Instead of the file system,
+  // fetch post data from an external API endpoint
+  const res = await fetch('..')
+  const posts = await res.json()
+  return posts.map(post => {
+    return {
+      params: {
+        id: post.id
+      }
+    }
+  })
+}
+```
+
+### **getStaticPaths**関数のreturnに含まれるfallbackオプションについて
+
+```js
+export async function getStaticPaths() {
+  // Return a list of possible value for id
+  const paths = getAllPostsIds();
+  return {
+    paths,
+    fallback: false,
+  };
+}
+```
+
+- fallback: falseの場合、
+  > getStaticPathで生成されたパス以外を指定された場合に404のページを返却する。
+- fallback: trueの場合、
+  > getStaticPathで生成されたパス以外を指定された場合に404のページを返却しない。
+- fallback: blockingの場合、
+  > 新しいパスはサーバーサイドでgetStaticPropsを使ってレンダリングされ、\
+  > 将来のリクエストに備えてキャッシュされるため、パスの生成は1回のみ実行される
+
+### Dynamic Routeの拡張について
+
+[連想配列].jsとして、getStaticPathsのパスの指定を下記のようにすることで、\
+階層をより深くした動的パスのルーティングが生成ができる。
+
+```js
+// pages/posts/[...id].js matches /posts/a,
+// but also /posts/a/b, /posts/a/b/c and so on.
+return [
+  {
+    params: {
+      // Statically Generates /posts/a/b/c
+      id: ['a', 'b', 'c']
+    }
+  }
+  //...
+]
+```
+
+### Error Pageのカスタム
+
+<https://nextjs.org/docs/advanced-features/custom-error-page>
+
+```js
+// pages/404.jsを作成し、Custom404()関数内に表示したい内容を返却する。
+export default function Custom404() {
+  return <h1>404 - Page Not Found</h1>
+}
+
+// ※500エラーの時なども同様
+```
