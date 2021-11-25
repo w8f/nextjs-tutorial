@@ -15,6 +15,7 @@ Next.js に入門してみた。
   - [Client Side Rendering](#section8)
 - [Dynamic Routes](#section9)
 - [API Routes](#section10)
+- [Vercelを利用したデプロイ方法](#section11)
 
 ## <a id="section1" href="#section1"> Why Next.js </a>
 
@@ -429,3 +430,15 @@ export default function Custom404() {
 ※ API Routes配下では、getStaticProps or getStaticPathsは使用するべきではない。\
 →サーバサイドで実行されるべきコード、ブラウザ側に渡したくないコード(DBのクエリ投げたり等)は、\
 getStaticProps or getStaticPathsを使用する。
+
+---
+
+## <a id="section11" href="#section11">Vercelを利用したデプロイ方法</a>
+
+とりあえずこれ見ましょう。\
+<https://nextjs.org/learn/basics/deploying-nextjs-app/deploy>
+
+チュートリアルの成果物\
+<https://nextjs-tutorial-w8f.vercel.app/>
+
+---
