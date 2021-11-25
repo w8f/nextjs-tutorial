@@ -14,6 +14,7 @@ Next.js に入門してみた。
   - [Server-side Rendering](#section7)
   - [Client Side Rendering](#section8)
 - [Dynamic Routes](#section9)
+- [API Routes](#section10)
 
 ## <a id="section1" href="#section1"> Why Next.js </a>
 
@@ -403,3 +404,28 @@ export default function Custom404() {
 
 // ※500エラーの時なども同様
 ```
+
+---
+
+## <a id="section10" href="#section10">API Routes</a>
+
+- APIエンドポイントをNode.jsのサーバーレス関数として作成できる。
+
+### API Routes 作成手順
+
+1. pagesディレクトリ配下にapiディレクトリ作成
+2. apiディレクトリ配下にhoge.jsファイルを作成
+3. 下記の用な感じでhandlerを定義してあげる
+
+```js
+  // pages/hoge.js
+  export default function handler(req, res) {
+    res.status(200).json({ text: "Hello" });
+  }
+```
+
+<http://localhost:3000/api/hoge>にアクセスすると上記のAPIが叩かれる
+
+※ API Routes配下では、getStaticProps or getStaticPathsは使用するべきではない。\
+→サーバサイドで実行されるべきコード、ブラウザ側に渡したくないコード(DBのクエリ投げたり等)は、\
+getStaticProps or getStaticPathsを使用する。
