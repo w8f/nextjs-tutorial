@@ -15,7 +15,8 @@ Next.js に入門してみた。
   - [Client Side Rendering](#section8)
 - [Dynamic Routes](#section9)
 - [API Routes](#section10)
-- [Vercelを利用したデプロイ方法](#section11)
+- [Vercel を利用したデプロイ方法](#section11)
+- [TypeScript 化](#section12)
 
 ## <a id="section1" href="#section1"> Why Next.js </a>
 
@@ -341,19 +342,19 @@ function Profile() {
 export async function getAllPostIds() {
   // Instead of the file system,
   // fetch post data from an external API endpoint
-  const res = await fetch('..')
-  const posts = await res.json()
-  return posts.map(post => {
+  const res = await fetch("..");
+  const posts = await res.json();
+  return posts.map((post) => {
     return {
       params: {
-        id: post.id
-      }
-    }
-  })
+        id: post.id,
+      },
+    };
+  });
 }
 ```
 
-### **getStaticPaths**関数のreturnに含まれるfallbackオプションについて
+### **getStaticPaths**関数の return に含まれる fallback オプションについて
 
 ```js
 export async function getStaticPaths() {
@@ -366,17 +367,17 @@ export async function getStaticPaths() {
 }
 ```
 
-- fallback: falseの場合、
-  > getStaticPathで生成されたパス以外を指定された場合に404のページを返却する。
-- fallback: trueの場合、
-  > getStaticPathで生成されたパス以外を指定された場合に404のページを返却しない。
-- fallback: blockingの場合、
-  > 新しいパスはサーバーサイドでgetStaticPropsを使ってレンダリングされ、\
-  > 将来のリクエストに備えてキャッシュされるため、パスの生成は1回のみ実行される
+- fallback: false の場合、
+  > getStaticPath で生成されたパス以外を指定された場合に 404 のページを返却する。
+- fallback: true の場合、
+  > getStaticPath で生成されたパス以外を指定された場合に 404 のページを返却しない。
+- fallback: blocking の場合、
+  > 新しいパスはサーバーサイドで getStaticProps を使ってレンダリングされ、\
+  > 将来のリクエストに備えてキャッシュされるため、パスの生成は 1 回のみ実行される
 
-### Dynamic Routeの拡張について
+### Dynamic Route の拡張について
 
-[連想配列].jsとして、getStaticPathsのパスの指定を下記のようにすることで、\
+[連想配列].js として、getStaticPaths のパスの指定を下記のようにすることで、\
 階層をより深くした動的パスのルーティングが生成ができる。
 
 ```js
@@ -386,21 +387,21 @@ return [
   {
     params: {
       // Statically Generates /posts/a/b/c
-      id: ['a', 'b', 'c']
-    }
-  }
+      id: ["a", "b", "c"],
+    },
+  },
   //...
-]
+];
 ```
 
-### Error Pageのカスタム
+### Error Page のカスタム
 
 <https://nextjs.org/docs/advanced-features/custom-error-page>
 
 ```js
 // pages/404.jsを作成し、Custom404()関数内に表示したい内容を返却する。
 export default function Custom404() {
-  return <h1>404 - Page Not Found</h1>
+  return <h1>404 - Page Not Found</h1>;
 }
 
 // ※500エラーの時なども同様
@@ -410,30 +411,30 @@ export default function Custom404() {
 
 ## <a id="section10" href="#section10">API Routes</a>
 
-- APIエンドポイントをNode.jsのサーバーレス関数として作成できる。
+- API エンドポイントを Node.js のサーバーレス関数として作成できる。
 
 ### API Routes 作成手順
 
-1. pagesディレクトリ配下にapiディレクトリ作成
-2. apiディレクトリ配下にhoge.jsファイルを作成
-3. 下記の用な感じでhandlerを定義してあげる
+1. pages ディレクトリ配下に api ディレクトリ作成
+2. api ディレクトリ配下に hoge.js ファイルを作成
+3. 下記の用な感じで handler を定義してあげる
 
 ```js
-  // pages/hoge.js
-  export default function handler(req, res) {
-    res.status(200).json({ text: "Hello" });
-  }
+// pages/hoge.js
+export default function handler(req, res) {
+  res.status(200).json({ text: "Hello" });
+}
 ```
 
-<http://localhost:3000/api/hoge>にアクセスすると上記のAPIが叩かれる
+<http://localhost:3000/api/hoge>にアクセスすると上記の API が叩かれる
 
-※ API Routes配下では、getStaticProps or getStaticPathsは使用するべきではない。\
-→サーバサイドで実行されるべきコード、ブラウザ側に渡したくないコード(DBのクエリ投げたり等)は、\
-getStaticProps or getStaticPathsを使用する。
+※ API Routes 配下では、getStaticProps or getStaticPaths は使用するべきではない。\
+→ サーバサイドで実行されるべきコード、ブラウザ側に渡したくないコード(DB のクエリ投げたり等)は、\
+getStaticProps or getStaticPaths を使用する。
 
 ---
 
-## <a id="section11" href="#section11">Vercelを利用したデプロイ方法</a>
+## <a id="section11" href="#section11">Vercel を利用したデプロイ方法</a>
 
 とりあえずこれ見ましょう。\
 <https://nextjs.org/learn/basics/deploying-nextjs-app/deploy>
@@ -442,3 +443,16 @@ getStaticProps or getStaticPathsを使用する。
 <https://nextjs-tutorial-w8f.vercel.app/>
 
 ---
+
+## <a id="section12" href="#section12">プロジェクトの TypeScript 化</a>
+
+```sh
+# 1. tsconfig.jsonファイル作成
+touch tsconfig.json
+
+# 2. npm run dev する。→tsconfig.jsonに設定が書き込みされる。
+
+# 3. typescript関連のパッケージをインストール
+# → next-env.d.tsファイルが自動で作成される。
+npm install --save-dev typescript @types/react @types/node
+```
