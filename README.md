@@ -290,11 +290,22 @@ export async function getServerSideProps(context) {
 Client Side Rendering を使用してデータを取得する場合は、\
 **SWR** と言われる React hooks を使用するのが推奨されている。
 
+### SWR
+
+```sh
+npm install swr
+```
+
 ```js
 // 使用例
 import useSWR from "swr";
 
 function Profile() {
+  // JSON データを使用する通常の RESTful API の場合、
+  // まずネイティブの fetch をラップした fetcher 関数を作成する必要があります
+  const fetcher = (...args) => fetch(...args).then((res) => res.json());
+
+  // 第２引数にfetcher関数を渡す。
   const { data, error } = useSWR("/api/user", fetch);
 
   if (error) return <div>failed to load</div>;
